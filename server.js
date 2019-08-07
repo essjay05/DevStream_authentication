@@ -9,6 +9,7 @@ const
     PORT = process.env.PORT || 3000;
 
 // Connect database
+require('./db/mongoose');
 
 // Middleware
 
