@@ -1,5 +1,6 @@
-// Require mongoose to create model
+// Require mongoose and jwt to create model
 const mongoose = require('mongoose');
+const jwt = require('jsonwebtoken');
 
 // Create new userSchema
 const UserSchema = new mongoose.Schema({
@@ -25,13 +26,13 @@ const UserSchema = new mongoose.Schema({
             required: true
         }
     }]
-}, {timestamps: true})
+}, {timestamps: true}) 
 
 // Creating method to generate authToken
 UserSchema.methods.generateAuthToken = async function() {
     let user = this;
     let access = 'auth';
-    let token = 'ASimpleStringForNow';
+    let token = jwt.sign({ _id: user._id.toHexString(), access }, '#!-S3cr3t_5Al7_5t12iNg-#!').toString();
     
     // Adding access and token variables to our user.tokens array
     user.tokens = user.tokens.concat([{ access, token }]);
@@ -40,6 +41,30 @@ UserSchema.methods.generateAuthToken = async function() {
     const savedToken = await user.save();
 
     return token;
+};
+
+// FindByToken method
+UserSchema.statics.findByToken = async function(token) {
+    let User = this;
+    var decoded;
+
+    try {
+        decoded = jwt.verify( token, '#!-S3cr3t_5Al7_5t12iNg-#!' );
+    } catch (err) {
+        return Promise.reject();
+    }
+
+    try {
+        const foundUser = await User.findOne({
+            '_id': decoded._id,
+            'tokens.token': token,
+            'tokens.access': 'auth'
+        });
+        
+        return foundUser;
+    } catch (err) {
+        return Promise.reject();
+    }
 };
 
 // Static method to allow to find user by email or password:
