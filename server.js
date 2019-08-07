@@ -5,6 +5,7 @@ const
     express = require('express'),
     app = express(),
     User = require('./models/user'),
+    authenticate = require('./middleware/authenticate'),
     bodyParser = require('body-parser'),
     path = require('path'),
     PORT = process.env.PORT || 3000;
@@ -14,9 +15,9 @@ require('./db/mongoose');
 
 // Middleware
 app.use(express.json());
-// app.use(bodyParser.json());
-// app.use(bodyParser.urlencoded({ extended: true}));
-// app.use(express.static(__dirname + '/public/views'));
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true}));
+app.use(express.static(__dirname + '/public/views'));
 
 // Routes
     // HOME Route
@@ -27,6 +28,11 @@ app.use(express.json());
     app.get('/api', (req, res) => {
         res.json({ message: `API Root Route`})
     });
+
+    // Authenticate route
+    app.get('/about', authenticate, (req, res) => {
+        res.sendFile(path.join(__dirname, '/public/views/about.html'));
+    })
 
     // USER Routes
         // Create user Route
