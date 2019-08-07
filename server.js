@@ -29,7 +29,7 @@ app.use(express.json());
     });
 
     // USER Routes
-        // Create user
+        // Create user Route
         app.post('/user/create', async (req, res) => {
             console.log(req.body);
             
@@ -44,6 +44,19 @@ app.use(express.json());
             } 
             catch (err) {
                 res.status(404).send(err);
+            }
+        })
+        // User Login Route
+        app.post('/users/login', async (req, res) => {
+            console.log(`Finding user email and password for login`);
+            try {
+            const user = await User.findByCredentials(req.body.email, req.body.password);
+            
+            const createdToken = await user.generateAuthToken();
+
+            res.status(200).header('x-auth', createdToken).send(user);
+            } catch (err) {
+                res.status(400).send({errorMsg: err});
             }
         })
 

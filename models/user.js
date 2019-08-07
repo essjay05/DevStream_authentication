@@ -14,8 +14,33 @@ const UserSchema = new mongoose.Schema({
         type: String,
         require: true,
         minlength: 6
-    }
+    },
+    tokens: [{
+        access: {
+            type: String,
+            required: true
+        },
+        token: {
+            type: String,
+            required: true
+        }
+    }]
 }, {timestamps: true})
+
+// Creating method to generate authToken
+UserSchema.methods.generateAuthToken = async function() {
+    let user = this;
+    let access = 'auth';
+    let token = 'ASimpleStringForNow';
+    
+    // Adding access and token variables to our user.tokens array
+    user.tokens = user.tokens.concat([{ access, token }]);
+    
+    // Await the result of the user.save function
+    const savedToken = await user.save();
+
+    return token;
+};
 
 // Static method to allow to find user by email or password:
 UserSchema.statics.findByCredentials = async function(email, password) {
