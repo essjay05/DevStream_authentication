@@ -14,9 +14,10 @@ const authenticate = async (req, res, next) => {
         req.user = foundUser;
         req.token = token;
         next();
-        
+
     } catch (err) {
-        res.status(401).send({ error: 'Authentication failed. Did you log in?'})
+        res.status(401).send({ error: 'Authentication failed. Did you log in?'});
+        console.log(err);
     }
 }
 

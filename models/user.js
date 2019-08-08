@@ -54,6 +54,7 @@ UserSchema.statics.findByToken = async function(token) {
         decoded = jwt.verify( token, process.env.JWT_SECRET );
     } catch (err) {
         return Promise.reject();
+        console.log(err);
     }
 
     try {
@@ -66,6 +67,7 @@ UserSchema.statics.findByToken = async function(token) {
         return foundUser;
     } catch (err) {
         return Promise.reject();
+        console.log(err);
     }
 };
 
@@ -82,6 +84,7 @@ UserSchema.statics.findByCredentials = async function(email, password) {
         return Promise.resolve(foundUser);
     } catch (err) {
         return Promise.reject(err);
+        console.log(err);
     }
 
 }
