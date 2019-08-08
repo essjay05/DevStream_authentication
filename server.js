@@ -8,6 +8,7 @@ const
     authenticate = require('./middleware/authenticate'),
     bodyParser = require('body-parser'),
     path = require('path'),
+    bcrypt = require('bcryptjs'),
     PORT = process.env.PORT || 3000;
 
 // Connect database
@@ -55,7 +56,7 @@ app.use(express.static(__dirname + '/public/views'));
         })
 
         // Update User Route
-        // UPDATE DOCS
+        // UPDATE User
         app.patch('/users/:id/edit', async (req, res) => {
             console.log(`User to be updated: ${req.params.id}`);
     
@@ -77,9 +78,10 @@ app.use(express.static(__dirname + '/public/views'));
         // User Login Route
         app.post('/users/login', async (req, res) => {
             console.log(`Finding user email and password for login`);
+            
             try {
                 const user = await User.findByCredentials(req.body.email, req.body.password);
-                
+                console.log(` I shouldnt be user is: ${user}`);
                 const createdToken = await user.generateAuthToken();
 
                 res.status(200).header('x-auth', createdToken).send(user);
@@ -93,3 +95,5 @@ app.use(express.static(__dirname + '/public/views'));
 app.listen(PORT, err => {
     console.log( err || `Server listening on PORT ${PORT}`)
 })
+
+

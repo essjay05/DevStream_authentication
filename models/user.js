@@ -75,18 +75,30 @@ UserSchema.statics.findByToken = async function(token) {
 UserSchema.statics.findByCredentials = async function(email, password) {
     let User = this;
     
-    // Create foundUser variable that awaits the found one using the email or password
-    try {const foundUser = await User.findOne({ email: email, password: password });
+    try {
+        const foundUser = await User.findOne({email});
         // if NOT found
         if (!foundUser) {
             return Promise.reject();
-        } 
+        } const matchedPw = await foundUser.comparePassword(password);
+        console.log(`matchedPw: ${matchedPw}`);
+        console.log(`foundUser: ${foundUser}`);
         return Promise.resolve(foundUser);
     } catch (err) {
-        return Promise.reject(err);
+        return Promise.reject();
         console.log(err);
     }
+}
 
+// Compare hashed user password to allow user to login if match
+UserSchema.methods.comparePassword = async function(password) {
+    const match = await bcrypt.compare(password, this.password);
+    if (!match) {
+        console.log(`Password is invalid.`)
+        return Promise.reject();
+    } console.log(`comparePassword match is: ${match}`)
+    console.log(`Success! Password is a match!`)
+    return Promise.resolve(match);;
 }
 
 UserSchema.pre('save', function(next) {
@@ -108,3 +120,4 @@ UserSchema.pre('save', function(next) {
 const User = mongoose.model('User', UserSchema);
 
 module.exports = User;
+
