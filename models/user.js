@@ -1,6 +1,8 @@
-// Require mongoose and jwt to create model
-const mongoose = require('mongoose');
-const jwt = require('jsonwebtoken');
+// Require mongoose and jwt, and bcryptjs to create model
+const 
+    mongoose = require('mongoose'),
+    jwt = require('jsonwebtoken'),
+    bcrypt = require('bcryptjs');
 
 // Create new userSchema
 const UserSchema = new mongoose.Schema({
@@ -32,7 +34,7 @@ const UserSchema = new mongoose.Schema({
 UserSchema.methods.generateAuthToken = async function() {
     let user = this;
     let access = 'auth';
-    let token = jwt.sign({ _id: user._id.toHexString(), access }, '#!-S3cr3t_5Al7_5t12iNg-#!').toString();
+    let token = jwt.sign({ _id: user._id.toHexString(), access }, process.env.JWT_SECRET).toString();
     
     // Adding access and token variables to our user.tokens array
     user.tokens = user.tokens.concat([{ access, token }]);
@@ -49,7 +51,7 @@ UserSchema.statics.findByToken = async function(token) {
     var decoded;
 
     try {
-        decoded = jwt.verify( token, '#!-S3cr3t_5Al7_5t12iNg-#!' );
+        decoded = jwt.verify( token, process.env.JWT_SECRET );
     } catch (err) {
         return Promise.reject();
     }
@@ -83,6 +85,21 @@ UserSchema.statics.findByCredentials = async function(email, password) {
     }
 
 }
+
+UserSchema.pre('save', function(next) {
+    let user = this;
+
+    if (user.isModified('password')) {
+        bcrypt.genSalt(10, (err, salt) => {
+            bcrypt.hash(user.password, salt, (err, hash) => {
+                user.password = hash;
+                next();
+            })
+        })
+    } else {
+        next();
+    }
+})
 
 // Export constant to be used everywhere
 const User = mongoose.model('User', UserSchema);

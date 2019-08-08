@@ -36,7 +36,7 @@ app.use(express.static(__dirname + '/public/views'));
 
     // USER Routes
         // Create user Route
-        app.post('/user/create', async (req, res) => {
+        app.post('/users/create', async (req, res) => {
             console.log(req.body);
             
             let user = new User({
@@ -50,8 +50,29 @@ app.use(express.static(__dirname + '/public/views'));
             } 
             catch (err) {
                 res.status(404).send(err);
+                console.log(err);
             }
         })
+
+        // Update User Route
+        // UPDATE DOCS
+        app.patch('/users/:id/edit', async (req, res) => {
+            console.log(`User to be updated: ${req.params.id}`);
+    
+            try {
+                const foundUser = await User.findOneAndUpdate({_id: req.params.id}, 
+                    {
+                        email: req.body.email,
+                        password: req.body.password
+                    });
+                const updatedUser = await foundUser.save();
+                res.status(200).send(`Successfully updated: ${foundUser} to ${updatedUser}`);
+            } catch (err) {
+                res.status(400).send(err);
+                console.log(err);
+            }    
+        });
+ 
 
         // User Login Route
         app.post('/users/login', async (req, res) => {
@@ -64,6 +85,7 @@ app.use(express.static(__dirname + '/public/views'));
                 res.status(200).header('x-auth', createdToken).send(user);
             } catch (err) {
                 res.status(400).send({errorMsg: err});
+                console.log(err);
             }
         })
 
