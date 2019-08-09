@@ -30,6 +30,10 @@ app.use(express.static(__dirname + '/public/views'));
         res.json({ message: `API Root Route`})
     });
 
+    // USERS ROUTES
+    const usersRoutes = require('./routes/users.js')
+    app.use('/api/users', usersRoutes);
+
     // Authenticate route
     app.get('/about', authenticate, (req, res) => {
         res.sendFile(path.join(__dirname, '/public/views/about.html'));
