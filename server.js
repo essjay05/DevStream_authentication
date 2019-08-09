@@ -20,19 +20,34 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true}));
 app.use(express.static(__dirname + '/public/views'));
 
+
+// app.use((req, res, next) => {
+//     app.locals.currentUser = req.user;
+//     app.locals.loggedIn = !!req.user;
+
+//     next();
+// });
 // Routes
-    // HOME Route
+    
+    // ROOT/HOME ROUTE:
     app.get('/', (req, res) => {
-        res.json({ success: true })
-    });
+        res.render('index')
+    })
     // API Root Route
     app.get('/api', (req, res) => {
         res.json({ message: `API Root Route`})
     });
 
-    // USERS ROUTES
-    const usersRoutes = require('./routes/users.js')
-    app.use('/api/users', usersRoutes);
+    
+    
+    
+    
+    
+    // ROUTES
+
+    // Use USERS ROUTES
+    const usersRouter = require('./routes/users.js')
+    app.use('/users', usersRouter);
 
     // Authenticate route
     app.get('/about', authenticate, (req, res) => {
