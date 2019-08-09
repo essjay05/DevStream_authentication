@@ -13,6 +13,19 @@ const UserSchema = new mongoose.Schema({
         minlength: 1,
         unique: true
     },
+    firstName: {
+        type: String,
+        minlength: 1
+    },
+    lastName: {
+        type: String,
+        minlength: 1
+    },
+    username: { 
+        type: String,
+        minlength: 4,
+        uniqe: true 
+    },
     password: {
         type: String,
         require: true,
@@ -76,14 +89,15 @@ UserSchema.statics.findByCredentials = async function(email, password) {
     let User = this;
     
     try {
-        const foundUser = await User.findOne({email});
+        const foundUser = await User.findOne({ email });
         // if NOT found
         if (!foundUser) {
             return Promise.reject();
-        } const matchedPw = await foundUser.comparePassword(password);
-        console.log(`matchedPw: ${matchedPw}`);
-        console.log(`foundUser: ${foundUser}`);
-        return Promise.resolve(foundUser);
+        } 
+        const matchedPw = await foundUser.comparePassword(password);
+            console.log(`matchedPw: ${matchedPw}`);
+            console.log(`foundUser: ${foundUser}`);
+            return Promise.resolve(foundUser);
     } catch (err) {
         return Promise.reject();
         console.log(err);
@@ -98,7 +112,7 @@ UserSchema.methods.comparePassword = async function(password) {
         return Promise.reject();
     } console.log(`comparePassword match is: ${match}`)
     console.log(`Success! Password is a match!`)
-    return Promise.resolve(match);;
+    return Promise.resolve(match);
 }
 
 UserSchema.pre('save', function(next) {

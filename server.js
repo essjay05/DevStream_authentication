@@ -9,6 +9,7 @@ const
     bodyParser = require('body-parser'),
     path = require('path'),
     bcrypt = require('bcryptjs'),
+    hbs = require('hbs'),
     PORT = process.env.PORT || 3000;
 
 // Connect database
@@ -20,6 +21,7 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true}));
 app.use(express.static(__dirname + '/public/views'));
 
+<<<<<<< HEAD
 
 // app.use((req, res, next) => {
 //     app.locals.currentUser = req.user;
@@ -27,6 +29,10 @@ app.use(express.static(__dirname + '/public/views'));
 
 //     next();
 // });
+=======
+app.set('view engine', 'hbs');
+
+>>>>>>> master
 // Routes
     
     // ROOT/HOME ROUTE:
@@ -61,6 +67,9 @@ app.use(express.static(__dirname + '/public/views'));
             
             let user = new User({
                 email: req.body.email,
+                firstName: req.body.firstName,
+                lastName: req.body.lastName,
+                username: req.body.username,
                 password: req.body.password
             });
 
@@ -100,13 +109,30 @@ app.use(express.static(__dirname + '/public/views'));
             
             try {
                 const user = await User.findByCredentials(req.body.email, req.body.password);
-                console.log(` I shouldnt be user is: ${user}`);
+                    console.log(` This is my user found: ${user}`);
                 const createdToken = await user.generateAuthToken();
 
                 res.status(200).header('x-auth', createdToken).send(user);
+            } catch (error) {
+                res.status(400).send({errorMsg: error});
+                console.log(error);
+            }
+        })
+        // Viewing User data on an html page
+        app.get('/user/:username', async (req, res) => {
+            console.log(req.params.username);
+            
+            try {
+                const foundUser = await User.findOne({ username: req.params.username })
+                console.log(foundUser);
+                res.render('user.hbs', {
+                username: foundUser.username,
+                email: foundUser.email,
+                firstName: foundUser.firstName,
+                lastName: foundUser.lastName
+                })
             } catch (err) {
-                res.status(400).send({errorMsg: err});
-                console.log(err);
+                res.status(404).send(`<h2> No person with the username ${req.params.username} found.</h2>`);
             }
         })
 
