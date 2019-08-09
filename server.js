@@ -81,13 +81,13 @@ app.use(express.static(__dirname + '/public/views'));
             
             try {
                 const user = await User.findByCredentials(req.body.email, req.body.password);
-                console.log(` I shouldnt be user is: ${user}`);
+                    console.log(` This is my user found: ${user}`);
                 const createdToken = await user.generateAuthToken();
 
                 res.status(200).header('x-auth', createdToken).send(user);
-            } catch (err) {
-                res.status(400).send({errorMsg: err});
-                console.log(err);
+            } catch (error) {
+                res.status(400).send({errorMsg: error});
+                console.log(error);
             }
         })
 
