@@ -88,30 +88,27 @@ req.user.save(( err, updatedUser) => {
 })
 });
 
-// ADDING HIKE to User's Hike Array
-usersRouter.patch('/profile', isLoggedIn, (req, res) => {
-console.log(req);
-})
+
 
 // LOG OUT
 usersRouter.get('/logout', (req, res) => {
-// DESTROY THE SESSION AND REDIRECT THE USER BACK TO THE SPLASH PAGE.
-req.logout();
-res.redirect('/');
+    // DESTROY THE SESSION AND REDIRECT THE USER BACK TO THE SPLASH PAGE.
+    req.logout();
+    res.redirect('/');
 });
 
 // DELETE USER PROFILE [DELETE] works :)
 usersRouter.delete('/profile', isLoggedIn, (req, res) => {
-User.findByIdAndDelete(req.user._id, (err, deletedUser) => {
-    if (err) res.json({ success: false, err });
-    res.render('index');
-})  
+    User.findByIdAndDelete(req.user._id, (err, deletedUser) => {
+        if (err) res.json({ success: false, err });
+        res.render('index');
+    })  
 });
 
 // MIDDLEWARE:
 function isLoggedIn(req, res, next) {
-if (req.isAuthenticated()) return next();
-res.redirect('/');
+    if (req.isAuthenticated()) return next();
+    res.redirect('/');
 }
 
 module.exports = usersRouter;
